@@ -17,7 +17,6 @@ const generateAccessAndRefreshToken = async (userId) => {
         throw new ApiError(500, "Something went wrong while generating access and refresh tokens")
     }
 
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 }
 
 export { generateAccessAndRefreshToken }
