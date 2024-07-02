@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // Getting input from user
     const { fullName, email, password, username } = req.body
-    console.log("email:", email);
+    // console.log("email:", email);
 
     // checking from no empty field
     if (fullName === "") {
@@ -34,7 +34,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // checking if user already exists 
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{ username }, { email }]
     })
 
@@ -44,7 +44,11 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // checking for images and avatar are uploaded by user or not 
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImageLocalPath = req.files?.coverImage[0]?.path;
+    }
 
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar uploading is mandatory")
@@ -77,7 +81,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // return response
     return res.status(201).json(
-        new ApiResponse(200, createdUser, "User registered Successfully")
+        new ApiResponse(200, createdUser, "User registered Successfully ")
     )
 })
 
