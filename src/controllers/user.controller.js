@@ -49,11 +49,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
     let coverImageLocalPath;
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
-        coverImageLocalPath = req.files?.coverImage[0]?.path;
+        coverImageLocalPath = req.files.coverImage[0].path
     }
 
+
     if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar uploading is mandatory")
+        throw new ApiError(400, "Avatar file is required")
     }
 
     // uploading image on cloudinary
@@ -102,7 +103,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const { email, username, password } = req.body
 
     // checking for no empty fields
-    if (!email || !username) {
+    if (!email && username) {
         throw new ApiError(400, "Email or Username is Required")
     }
 
@@ -151,30 +152,28 @@ const loginUser = asyncHandler(async (req, res) => {
 
 // LOGOUT METHOD
 const logoutUser = asyncHandler(async (req, res) => {
-    // clearing tokens
     await User.findByIdAndUpdate(
         req.user._id,
         {
             $set: {
-                refreshToken: undefined
+                refreshToken: undefined// this removes the field from document
             }
         },
         {
             new: true
         }
-
     )
-    // clearing cookies
+
     const options = {
         httpOnly: true,
         secure: true
     }
+
     return res
         .status(200)
-        .cookie("accessToken", options)
-        .cookie("refreshToken", options)
-        .json(
-            new ApiResponse(200, {}, "User LoggedOut Successfully")
-        )
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse(200, {}, "User logged Out"))
 })
+
 export { registerUser, loginUser, logoutUser }
