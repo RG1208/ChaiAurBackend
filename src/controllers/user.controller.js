@@ -88,7 +88,6 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 })
 
-
 // LOGIN USER
 
 // 1.fetch data from req.body
@@ -247,17 +246,16 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)
-        .json(200, req.status, "current user fetched successfully")
+        .json(new ApiResponse(200, req.user, "current user fetched successfully"))
 })
 
 // updating account details
-
 const updateAccoutnDetails = asyncHandler(async (req, res) => {
     const { fullName, email } = req.body
     if (!fullName || !email) {
         throw new ApiError(400, "All fields are required")
     }
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
@@ -273,7 +271,7 @@ const updateAccoutnDetails = asyncHandler(async (req, res) => {
 
 })
 
-
+// updating avatar Image
 const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path
 
@@ -305,6 +303,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         )
 })
 
+// updating cover Image
 const updateUserCoverImage = asyncHandler(async (req, res) => {
     const coverImageLocalPath = req.file?.path
 
